@@ -1,24 +1,30 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { Prisma } from '@prisma/client';
+
 
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  async create(CreateUserDto: CreateUserDto) {
-    const createData = await this.prisma.user.create({
+  async create(user: CreateUserDto) {
+    try {
+      const createData = await this.prisma.user.create({
       data: {
-        id: CreateUserDto.id,
-        username: CreateUserDto.username,
-        password: CreateUserDto.password
+        username: user.username,
+        password: user.password
       }
     });
-
     return{
       statusCode: 200,
       data: createData
+    }
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError &&
+         error.code === 'P2002') throw new ConflictException('Username already register') 
+      throw error;
     }
   }
 
