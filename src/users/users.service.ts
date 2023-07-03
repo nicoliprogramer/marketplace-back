@@ -1,8 +1,10 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, BadRequestException} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Prisma } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
+import * as jwt from 'jsonwebtoken'
 
 
 @Injectable()
@@ -28,6 +30,27 @@ export class UsersService {
     }
   }
 
+  async login(user: CreateUserDto){
+    try {
+      const userData = await this.prisma.user.findUnique({
+         where: {username: user.username}
+      })
+      const isMatch = await bcrypt.compare(user.password , userData.password)
+      if(!isMatch){
+        throw new BadRequestException("User not found");
+        }
+        const token = await jwt.sign({id: userData.id, username: userData.username}, process.env.TOKEN_SECRET)
+
+    return{
+      token
+    }
+    } catch (error) {
+      // if (error instanceof Prisma.PrismaClientKnownRequestError &&
+      //    error.code === 'P2002') throw new ConflictException('Username already register') 
+      throw error;
+    }
+  }
+
   async findAll() {
     const dataUser = await this.prisma.user.findMany({});
     return {
@@ -37,7 +60,7 @@ export class UsersService {
   }
 
   async findOne(id: number) {
-    const dataUser = await this.prisma.user.findFirst({
+    const dataUser = await this.prisma.user.findUnique({
       where: {
         id
       }

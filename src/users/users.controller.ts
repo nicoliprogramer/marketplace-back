@@ -3,6 +3,11 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
+import * as jwt from 'jsonwebtoken'
+import * as dotenv from 'dotenv'
+
+
+dotenv.config()
 
 const saltOrRounds = 10;
 
@@ -10,13 +15,20 @@ const saltOrRounds = 10;
 export class UsersController {
   constructor(private readonly UsersService: UsersService) {}
 
-  @Post()
+  @Post('register')
   async create(@Body() user: CreateUserDto) {
     const hash = await bcrypt.hash(user.password, saltOrRounds);
     return  await this.UsersService.create({... user, password: hash});
   }
 
-  @Get()
+
+  @Post('login')
+  async login(@Body() body: CreateUserDto){
+  const user = await this.UsersService.login(body);
+    return user
+  } 
+
+   @Get()
   async findAll() {
     return await this.UsersService.findAll();
   }
