@@ -35,18 +35,20 @@ export class UsersService {
       const userData = await this.prisma.user.findUnique({
          where: {username: user.username}
       })
+      if(!userData){
+        throw new BadRequestException("User not found");
+      }
       const isMatch = await bcrypt.compare(user.password , userData.password)
       if(!isMatch){
         throw new BadRequestException("User not found");
         }
         const token = await jwt.sign({id: userData.id, username: userData.username}, process.env.TOKEN_SECRET)
-
     return{
       token
     }
     } catch (error) {
-      // if (error instanceof Prisma.PrismaClientKnownRequestError &&
-      //    error.code === 'P2002') throw new ConflictException('Username already register') 
+       if (error instanceof Prisma.PrismaClientKnownRequestError &&
+          error.code === 'P1013') throw new ConflictException('User not found') 
       throw error;
     }
   }

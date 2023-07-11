@@ -3,11 +3,6 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
-import * as jwt from 'jsonwebtoken'
-import * as dotenv from 'dotenv'
-
-
-dotenv.config()
 
 const saltOrRounds = 10;
 
@@ -20,7 +15,6 @@ export class UsersController {
     const hash = await bcrypt.hash(user.password, saltOrRounds);
     return  await this.UsersService.create({... user, password: hash});
   }
-
 
   @Post('login')
   async login(@Body() body: CreateUserDto){
