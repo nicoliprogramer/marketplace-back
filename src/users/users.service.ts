@@ -1,6 +1,7 @@
 import { ConflictException, Injectable, BadRequestException} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { RegisterUserDto } from './dto/register-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Prisma } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
@@ -11,17 +12,18 @@ import * as jwt from 'jsonwebtoken'
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  async create(user: CreateUserDto) {
+  async create(user: RegisterUserDto) {
     try {
       const createData = await this.prisma.user.create({
       data: {
+        email: user.email,
         username: user.username,
         password: user.password
       }
     });
+      const token = await jwt.sign({id: createData.id, username: createData.username}, process.env.TOKEN_SECRET)
     return{
-      statusCode: 200,
-      data: createData
+      token
     }
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError &&
@@ -49,7 +51,7 @@ export class UsersService {
     } catch (error) {
        if (error instanceof Prisma.PrismaClientKnownRequestError &&
           error.code === 'P1013') throw new ConflictException('User not found') 
-      throw error;
+       throw error;
     }
   }
 

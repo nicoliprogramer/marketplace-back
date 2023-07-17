@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { RegisterUserDto } from './dto/register-user.dto';
 import * as bcrypt from 'bcrypt';
 
 const saltOrRounds = 10;
@@ -11,7 +12,7 @@ export class UsersController {
   constructor(private readonly UsersService: UsersService) {}
 
   @Post('register')
-  async create(@Body() user: CreateUserDto) {
+  async create(@Body() user: RegisterUserDto) {
     const hash = await bcrypt.hash(user.password, saltOrRounds);
     return  await this.UsersService.create({... user, password: hash});
   }
