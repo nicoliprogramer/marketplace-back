@@ -1,6 +1,6 @@
-import {IsNotEmpty, IsString, isInt, isNumber} from 'class-validator'
+import {IsNotEmpty, IsString} from 'class-validator'
 
-export class CreateUserDto {
+export class LoginUserDto {
 
     @IsNotEmpty()
     @IsString()

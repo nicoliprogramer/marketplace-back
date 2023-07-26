@@ -1,16 +1,13 @@
-import { ConflictException, Injectable, BadRequestException} from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
+import { ConflictException, Injectable} from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Prisma } from '@prisma/client';
-import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken'
-
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async create(user: RegisterUserDto) {
     try {
@@ -32,43 +29,14 @@ export class UsersService {
     }
   }
 
-  async login(user: CreateUserDto){
-    try {
-      const userData = await this.prisma.user.findUnique({
-         where: {username: user.username}
-      })
-      if(!userData){
-        throw new BadRequestException("User not found");
-      }
-      const isMatch = await bcrypt.compare(user.password , userData.password)
-      if(!isMatch){
-        throw new BadRequestException("User not found");
-        }
-        const token = await jwt.sign({id: userData.id, username: userData.username}, process.env.TOKEN_SECRET)
-    return{
-      token
-    }
-    } catch (error) {
-       if (error instanceof Prisma.PrismaClientKnownRequestError &&
-          error.code === 'P1013') throw new ConflictException('User not found') 
-       throw error;
-    }
-  }
-
   async findAll() {
-    const dataUser = await this.prisma.user.findMany({});
-    return {
-      statusCode: 200,
-      data: dataUser
-    }
+    return this.prisma.user.findMany({});
   }
 
   async findOne(id: number) {
     const dataUser = await this.prisma.user.findUnique({
-      where: {
-        id
-      }
-    });
+      where: {id}
+    })
     return {
       statusCode: 200,
       data: dataUser
