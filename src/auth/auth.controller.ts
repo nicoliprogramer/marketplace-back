@@ -1,4 +1,4 @@
-import { Body, Controller, Post, HttpCode, HttpStatus } from '@nestjs/common';
+import { Body, Controller, Post} from '@nestjs/common';
 import { ApiTags, ApiOkResponse } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
@@ -10,8 +10,9 @@ export class AuthController {
     constructor(private readonly authService: AuthService){}
 
     @Post('login')
-    @ApiOkResponse({ type: AuthEntity })
-    login(@Body() loginDto: LoginDto){
-    return this.authService.login(loginDto); 
+    @ApiOkResponse({type: AuthEntity})
+    login(@Body() body: LoginDto){
+    const user = this.authService.login(body);
+    return user
     }
 }
