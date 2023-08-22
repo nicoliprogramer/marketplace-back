@@ -7,11 +7,11 @@ import { StoreEntity } from './entities/store.entity';
 
 @Controller('store')
 export class StoreController {
-constructor(private readonly StoreService: StoreService) {}
+constructor(private readonly storeService: StoreService) {}
    
 @Get()
  async findAll() {
-   const stock = await this.StoreService.findAll();
+   const stock = await this.storeService.findAll();
    return stock;
  }
 
@@ -21,6 +21,6 @@ constructor(private readonly StoreService: StoreService) {}
 @ApiBearerAuth()
 @ApiOkResponse({ type: StoreEntity})
   async update(@Param('id') id: string, @Body() product: UpdateProductDto) {
-    return await this.StoreService.update(+id, product);
+    return await this.storeService.update(+id, product);
   }
 }

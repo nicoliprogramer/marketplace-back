@@ -10,9 +10,9 @@ export class StoreService {
     return this.prisma.store.findMany({});
   }
 
-  async update(id: number, UpdateStoreDto: UpdateProductDto) {
+  async update(id: number, updateStoreDto: UpdateProductDto) {
     const updateProduct = await this.prisma.store.update({
-      data: UpdateStoreDto,
+      data: updateStoreDto,
       where: {
         id
       }

@@ -12,13 +12,13 @@ const saltOrRounds = 10;
 @Controller('users')
 @ApiTags('users')
 export class UsersController {
-  constructor(private readonly UsersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) {}
 
   @Post('register')
   @ApiCreatedResponse({ type: UserEntity })
   async create(@Body() user: RegisterUserDto) {
     const hash = await bcrypt.hash(user.password, saltOrRounds);
-    return  await this.UsersService.create({... user, password: hash});
+    return  await this.usersService.create({... user, password: hash});
   }
 
   @Get()
@@ -26,7 +26,7 @@ export class UsersController {
   @ApiBearerAuth()
   @ApiOkResponse({ type: UserEntity})
    async findAll() {
-    const users = await this.UsersService.findAll();
+    const users = await this.usersService.findAll();
     return users.map((user) => new UserEntity(user));
   }
 
@@ -35,7 +35,7 @@ export class UsersController {
    @ApiBearerAuth()
    @ApiOkResponse({ type: UserEntity})
    async findOne(@Param('id') id: string) {
-    return await this.UsersService.findOne(+id);
+    return await this.usersService.findOne(+id);
   }
 
 
@@ -44,7 +44,7 @@ export class UsersController {
   @ApiBearerAuth()
   @ApiOkResponse({ type: UserEntity})
   async update(@Param('id') id: string, @Body() user: UpdateUserDto) {
-    return await this.UsersService.update(+id, user);
+    return await this.usersService.update(+id, user);
   }
 
   
@@ -53,6 +53,6 @@ export class UsersController {
   @ApiBearerAuth()
   @ApiOkResponse({ type: UserEntity})
   async remove(@Param('id') id: string) {
-    return await this.UsersService.remove(+id);
+    return await this.usersService.remove(+id);
   }
 }
